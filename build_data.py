@@ -23,12 +23,14 @@ Usage :
 """
 
 import argparse
+import gzip
 import json
 import re
 import sys
 import urllib.request
 
 DATASET = "arrets-transporteur"
+DATASET_LIGNES = "referentiel-des-lignes"
 EXPORT_URL = (
     "https://data.iledefrance-mobilites.fr/api/explore/v2.1"
     "/catalog/datasets/{dataset}/exports/json"
@@ -53,8 +55,13 @@ def fetch(dataset=DATASET):
     """Télécharge un jeu complet. L'export ne demande ni clé ni pagination."""
     url = EXPORT_URL.format(dataset=dataset)
     print("téléchargement de %s…" % dataset, file=sys.stderr)
-    with urllib.request.urlopen(url, timeout=300) as r:
-        data = json.load(r)
+    requete = urllib.request.Request(url, headers={"Accept-Encoding": "gzip"})
+    with urllib.request.urlopen(requete, timeout=300) as r:
+        brut = r.read()
+    # selon le jeu, le serveur répond en gzip qu'on l'ait demandé ou non
+    if brut[:2] == b"\x1f\x8b":
+        brut = gzip.decompress(brut)
+    data = json.loads(brut.decode("utf-8"))
     print("  %d enregistrements" % len(data), file=sys.stderr)
     return data
 
@@ -97,6 +104,32 @@ def pretty(name):
     return texte
 
 
+def normalise(nom):
+    """Clé de rapprochement entre les deux référentiels, qui ne s'accordent ni
+    sur la casse, ni sur les accents, ni sur les tirets."""
+    import unicodedata
+    t = unicodedata.normalize("NFD", nom or "")
+    t = "".join(c for c in t if unicodedata.category(c) != "Mn").lower()
+    for c in "-–—'’.":
+        t = t.replace(c, " ")
+    return " ".join(t.split())
+
+
+def collect_exploitants():
+    """Nom de réseau ou d'exploitant -> société exploitante, depuis le
+    référentiel des lignes, seul jeu à publier `operatorname`."""
+    index = {}
+    for l in fetch(DATASET_LIGNES):
+        reseau, societe = l.get("networkname"), l.get("operatorname")
+        if not societe:
+            continue
+        # le jeu des arrêts nomme tantôt le réseau, tantôt la société
+        for cle in (reseau, societe):
+            if cle:
+                index.setdefault(normalise(cle), societe)
+    return index
+
+
 def collect_fournisseurs(rows):
     """fournisseurid -> (nom, nombre d'arrêts, nombre de privatecode exploitables)."""
     out = {}
@@ -117,9 +150,24 @@ def collect_fournisseurs(rows):
     return {k: tuple(v) for k, v in out.items()}
 
 
+def trouve_exploitant(brut, joli, index):
+    """Les deux référentiels ne nomment pas toujours le réseau pareil : « BOUCLE
+    NORD DE SEINE » d'un côté, « Boucles Nord de Seine » de l'autre. On tente
+    l'égalité, puis l'inclusion si elle ne désigne qu'un seul candidat."""
+    for cle in (normalise(brut), normalise(joli)):
+        if cle in index:
+            return index[cle]
+    cle = normalise(brut)
+    if len(cle) < 10:
+        return None
+    candidats = {v for k, v in index.items() if cle in k or k in cle}
+    return candidats.pop() if len(candidats) == 1 else None
+
+
 def cmd_providers(args):
     rows = fetch()
     fournisseurs = collect_fournisseurs(rows)
+    exploitants = {} if args.no_operators else collect_exploitants()
 
     existant = {}
     reseaux = []
@@ -137,9 +185,12 @@ def cmd_providers(args):
         if pid is None or pid in NON_DSP.values():
             continue  # SNCF et RATP gardent leur libellé simple
         entree = {"id": pid, "dsp": dsp_number(fid), "network": pretty(nom)}
-        # l'exploitant est saisi à la main : on reprend ce qui existait
+        # l'exploitant vient du référentiel des lignes ; à défaut on garde
+        # ce qui avait été saisi à la main
         ancien_nom = existant.get(pid, {})
-        entree["operator"] = ancien_nom.get("operator") or ancien_nom.get("name") or ""
+        entree["operator"] = (trouve_exploitant(nom, entree["network"], exploitants)
+                              or ancien_nom.get("operator")
+                              or ancien_nom.get("name") or "")
         if entree["dsp"] is None:
             del entree["dsp"]
         sortie[pid] = entree
@@ -285,6 +336,8 @@ def main():
     p = sub.add_parser("providers", help="génère Providers.json")
     p.add_argument("--merge", help="Providers.json existant, pour garder les exploitants saisis à la main")
     p.add_argument("-o", "--out", default="Providers.json")
+    p.add_argument("--no-operators", action="store_true",
+                   help="ne pas interroger le référentiel des lignes")
     p.set_defaults(func=cmd_providers)
 
     p = sub.add_parser("stations", help="brouillon de NavigoStations.json, incomplet")

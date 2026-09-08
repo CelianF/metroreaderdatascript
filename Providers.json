@@ -70,19 +70,19 @@
       "id": 202,
       "dsp": 2,
       "network": "Cergy-Pontoise Confluence",
-      "operator": ""
+      "operator": "Francilité Seine et Oise"
     },
     {
       "id": 203,
       "dsp": 3,
       "network": "Haut Val d’Oise",
-      "operator": ""
+      "operator": "Keolis Nord Val d’Oise"
     },
     {
       "id": 204,
       "dsp": 4,
       "network": "Val Parisis",
-      "operator": ""
+      "operator": "Francilité Val Parisis"
     },
     {
       "id": 205,
@@ -94,97 +94,97 @@
       "id": 206,
       "dsp": 6,
       "network": "Roissy Ouest",
-      "operator": ""
+      "operator": "Keolis Roissy Pays de France Ouest"
     },
     {
       "id": 207,
       "dsp": 7,
       "network": "Terres d'Envol",
-      "operator": ""
+      "operator": "Transdev Nord Seine-Saint-Denis"
     },
     {
       "id": 208,
       "dsp": 8,
       "network": "Roissy Est",
-      "operator": ""
+      "operator": "Keolis Roissy Pays de France Est"
     },
     {
       "id": 209,
       "dsp": 9,
       "network": "Marne et Brie",
-      "operator": ""
+      "operator": "Keolis Grand Paris Vallée de la Marne"
     },
     {
       "id": 210,
       "dsp": 10,
       "network": "Transdev Marne la Vallée",
-      "operator": ""
+      "operator": "Transdev Marne-la-Vallée"
     },
     {
       "id": 211,
       "dsp": 11,
       "network": "Meaux et Ourcq",
-      "operator": ""
+      "operator": "Transdev Marne-et-Ourcq"
     },
     {
       "id": 212,
       "dsp": 12,
       "network": "Brie et 2 Morin",
-      "operator": ""
+      "operator": "Transdev Brie et 2 Morin"
     },
     {
       "id": 213,
       "dsp": 13,
       "network": "Pays Briard",
-      "operator": ""
+      "operator": "Keolis Portes et Val de Brie"
     },
     {
       "id": 214,
       "dsp": 14,
       "network": "Provinois – Brie et Seine",
-      "operator": ""
+      "operator": "Francilité Grand Provinois"
     },
     {
       "id": 215,
       "dsp": 15,
       "network": "Pays de Montereau",
-      "operator": ""
+      "operator": "Francilité Pays de Montereau"
     },
     {
       "id": 216,
       "dsp": 16,
       "network": "Fontainebleau - Moret",
-      "operator": ""
+      "operator": "Transdev Pays de Fontainebleau"
     },
     {
       "id": 217,
       "dsp": 17,
       "network": "Vallée du Loing - Nemours",
-      "operator": ""
+      "operator": "Transdev Vallée du Loing"
     },
     {
       "id": 218,
       "dsp": 18,
       "network": "Grand Melun",
-      "operator": ""
+      "operator": "Transdev Melun"
     },
     {
       "id": 219,
       "dsp": 19,
       "network": "Transdev Sénart",
-      "operator": ""
+      "operator": "Transdev Senart"
     },
     {
       "id": 220,
       "dsp": 20,
       "network": "Val d’Yerres Val de Seine",
-      "operator": ""
+      "operator": "Keolis Val d'Yerres Val de Seine"
     },
     {
       "id": 221,
       "dsp": 21,
       "network": "Marne et Seine",
-      "operator": "Transdev Coteaux de la Marne"
+      "operator": "Transdev Côteaux de la Marne"
     },
     {
       "id": 222,
@@ -196,31 +196,31 @@
       "id": 223,
       "dsp": 23,
       "network": "Évry Centre Essonne",
-      "operator": ""
+      "operator": "TISSE"
     },
     {
       "id": 224,
       "dsp": 24,
       "network": "Essonne Sud Ouest",
-      "operator": ""
+      "operator": "Transdev Sud-Ouest Essonne"
     },
     {
       "id": 225,
       "dsp": 25,
       "network": "Cœur d’Essonne",
-      "operator": ""
+      "operator": "Transdev Cœur Essonne"
     },
     {
       "id": 226,
       "dsp": 26,
       "network": "Paris Saclay",
-      "operator": "RC Saclay"
+      "operator": "RD Saclay"
     },
     {
       "id": 227,
       "dsp": 27,
       "network": "Vélizy Vallées",
-      "operator": ""
+      "operator": "Keolis Vélizy Vallée de la Bièvre"
     },
     {
       "id": 228,
@@ -232,7 +232,7 @@
       "id": 229,
       "dsp": 29,
       "network": "Saint-Quentin-en-Yvelines",
-      "operator": ""
+      "operator": "Francilité Saint-Quentin-en-Yvelines"
     },
     {
       "id": 230,
@@ -244,108 +244,108 @@
       "id": 231,
       "dsp": 31,
       "network": "Essonne Sud Est",
-      "operator": ""
+      "operator": "Keolis Val d'Essonne Deux Vallées"
     },
     {
       "id": 232,
       "dsp": 32,
       "network": "Saint Germain Boucles de Seine",
-      "operator": ""
+      "operator": "Transdev Boucle des Lys"
     },
     {
       "id": 233,
       "dsp": 33,
       "network": "Argenteuil - Boucles de Seine",
-      "operator": ""
+      "operator": "Keolis Argenteuil Boucles de Seine"
     },
     {
       "id": 234,
       "dsp": 34,
       "network": "Poissy - les Mureaux",
-      "operator": ""
+      "operator": "Keolis Seine et Oise Est"
     },
     {
       "id": 235,
       "dsp": 35,
       "network": "Mantois",
-      "operator": "RATP Cap Mantois"
+      "operator": "RD Mantois"
     },
     {
       "id": 236,
       "dsp": 36,
       "network": "Massy – Juvisy",
-      "operator": ""
+      "operator": "RATP Cap Massy-Juvisy"
     },
     {
       "id": 237,
       "dsp": 37,
       "network": "Bièvre",
-      "operator": ""
+      "operator": "RD Bièvre"
     },
     {
       "id": 238,
       "dsp": 38,
       "network": "Lignes Île-de-France Ouest",
-      "operator": ""
+      "operator": "Francilité Express Ouest"
     },
     {
       "id": 239,
       "dsp": 39,
       "network": "Express Roissy",
-      "operator": ""
+      "operator": "Transdev Express Roissy"
     },
     {
       "id": 240,
       "dsp": 40,
       "network": "Croix du Sud",
-      "operator": ""
+      "operator": "ATM Croix du Sud"
     },
     {
       "id": 241,
       "dsp": 41,
       "network": "Defense Seine Ouest",
-      "operator": ""
+      "operator": "RATP Cap Défense Seine Ouest"
     },
     {
       "id": 242,
       "dsp": 42,
       "network": "Boucle Nord de Seine",
-      "operator": ""
+      "operator": "RATP Cap Boucle Nord de Seine"
     },
     {
       "id": 243,
       "dsp": 43,
       "network": "Plaine Saint-Denis",
-      "operator": ""
+      "operator": "RATP Cap Plaine Saint-Denis"
     },
     {
       "id": 244,
       "dsp": 44,
       "network": "Transdev Ourcq",
-      "operator": ""
+      "operator": "Transdev Ourcq"
     },
     {
       "id": 245,
       "dsp": 45,
       "network": "RATP Cap Boucles de Marne",
-      "operator": ""
+      "operator": "RATP Cap Boucles de Marne"
     },
     {
       "id": 246,
       "dsp": 46,
       "network": "Pompadour",
-      "operator": ""
+      "operator": "RATP Cap Pompadour"
     },
     {
       "id": 247,
       "dsp": 47,
       "network": "Seine Orly",
-      "operator": ""
+      "operator": "Keolis Grand Paris Seine Orly"
     },
     {
       "id": 299,
       "network": "GC Marne et Brie",
-      "operator": ""
+      "operator": "Keolis Grand Paris Vallée de la Marne"
     }
   ],
   "networks": [
