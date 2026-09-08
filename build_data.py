@@ -31,6 +31,7 @@ import urllib.request
 
 DATASET = "arrets-transporteur"
 DATASET_LIGNES = "referentiel-des-lignes"
+DATASET_ARRETS_LIGNES = "arrets-lignes"
 EXPORT_URL = (
     "https://data.iledefrance-mobilites.fr/api/explore/v2.1"
     "/catalog/datasets/{dataset}/exports/json"
@@ -213,7 +214,7 @@ def cmd_providers(args):
           % (args.out, len(providers), dsp, sans))
 
 
-MODES = {"bus": "Bus urbain", "metro": "Métro", "tram": "Tramway",
+MODES = {"bus": "Bus urbain", "metro": "Métro", "tram": "Tramway", "rail": "Train", "metro": "Métro", "tram": "Tramway",
          "rail": "Train", "train": "Train", "funicular": "Câble",
          "cablecar": "Câble", "ferry": "Navette fluviale"}
 
@@ -270,6 +271,135 @@ def cmd_stations(args):
     print("ATTENTION : le mode vient de arttype, qui ne distingue pas bus urbain "
           "et interurbain, et le tableau lines n'est pas renseigné. À valider "
           "avant de remplacer le fichier de l'app.", file=sys.stderr)
+
+
+def cmd_geo(args):
+    """Table de proximité : tous les arrêts, nom et position, sans code billettique.
+
+    Sert uniquement à suggérer un nom quand la carte annonce un identifiant
+    inconnu et que l'utilisateur accepte de donner sa position. Comme elle ne
+    dépend pas du privatecode, elle couvre aussi les treize réseaux qui n'en ont
+    pas déclaré — ceux, précisément, où l'on en a besoin.
+    """
+    rows = fetch()
+    vus, out, ignores = set(), [], 0
+    for r in rows:
+        types = r.get("arttype") or []
+        mode = MODES.get(types[0] if types else "", None)
+        pt = r.get("artgeopoint") or {}
+        nom = r.get("artname")
+        if mode is None or not nom or "lat" not in pt:
+            ignores += 1
+            continue
+        lat, lon = round(pt["lat"], 5), round(pt["lon"], 5)
+        # les quais d'un même arrêt font double emploi pour une suggestion
+        cle = (nom, mode, round(lat, 4), round(lon, 4))
+        if cle in vus:
+            continue
+        vus.add(cle)
+        out.append({"name": nom, "mode": mode, "lat": lat, "lon": lon})
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+    import os
+    print("%s : %d arrêts, %d ignorés, %.1f Mo"
+          % (args.out, len(out), ignores, os.path.getsize(args.out) / 1e6))
+
+
+def decode_privatecode(code):
+    """Le privatecode d'une ligne encode l'exploitant et le numéro de course que
+    porte la carte, sur neuf chiffres : EEE SSS CCC. Le dernier tiers est le
+    numéro de course, le premier l'exploitant côté IDFM.
+
+    C00139 -> 501501022 : Vexin (fournisseur 501), course 22
+    C01374 -> 100110004 : RATP, course 4
+    """
+    if not code or not str(code).isdigit() or len(str(code)) != 9:
+        return None, None
+    code = str(code)
+    fournisseur = int(code[:3])
+    course = int(code[6:])
+    # le référentiel des lignes ne numérote pas les exploitants comme celui des
+    # arrêts : la RATP y est 100, quand elle est 59 côté arrêts
+    if fournisseur == 100:
+        return 3, course
+    return intercode_id(fournisseur), course
+
+
+def cmd_lines(args):
+    lignes = fetch(DATASET_LIGNES)
+    out, ignores = [], 0
+    for l in lignes:
+        pid, course = decode_privatecode(l.get("privatecode"))
+        mode = MODES.get((l.get("transportmode") or "").lower())
+        if pid is None or course is None or mode is None:
+            ignores += 1
+            continue
+        out.append({
+            "name": l.get("shortname_line") or l.get("name_line") or "",
+            "provider_id": pid,
+            "line_id": course,
+            "public_id": l.get("id_line") or "",
+            "mode": mode,
+            "background_color": (l.get("colourweb_hexa") or "c5c5c5").lower(),
+            "text_color": (l.get("textcolourweb_hexa") or "000000").lower(),
+            "is_noctilien": (l.get("shortname_line") or "").upper().startswith("N"),
+        })
+    ajoutees = 0
+    if args.merge:
+        with open(args.merge, encoding="utf-8") as f:
+            existant = json.load(f)
+        # Le fichier en place associe parfois plusieurs numéros de course à une
+        # même ligne, ce que le privatecode ne donne pas. On complète donc sans
+        # jamais retirer : seules les clés absentes sont ajoutées.
+        connues = {(l.get("provider_id"), l.get("line_id"), l.get("mode")) for l in existant}
+        nouvelles = [l for l in out
+                     if (l["provider_id"], l["line_id"], l["mode"]) not in connues]
+        ajoutees = len(nouvelles)
+        out = existant + nouvelles
+
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+    print("%s : %d lignes au total, %d ignorées à la lecture%s"
+          % (args.out, len(out), ignores,
+             ", %d ajoutées" % ajoutees if args.merge else ""))
+
+
+def cmd_linestops(args):
+    """Table ligne -> arrêts, depuis « Arrêts et lignes associées ».
+
+    Ce jeu associe chaque ligne à ses arrêts par l'identifiant IDFM de la ligne,
+    celui que le fichier des lignes appelle public_id. Il ne dépend donc pas du
+    code billettique, et couvre les réseaux qui n'en ont pas déclaré.
+    """
+    rows = fetch(DATASET_ARRETS_LIGNES)
+    table, vus, ignores = {}, set(), 0
+    for r in rows:
+        ligne = (r.get("id") or "").replace("IDFM:", "")
+        nom = r.get("stop_name")
+        try:
+            lat, lon = round(float(r["stop_lat"]), 5), round(float(r["stop_lon"]), 5)
+        except (KeyError, TypeError, ValueError):
+            ignores += 1
+            continue
+        if not ligne or not nom:
+            ignores += 1
+            continue
+        # les quais d'un même arrêt font double emploi sur une même ligne
+        cle = (ligne, nom)
+        if cle in vus:
+            continue
+        vus.add(cle)
+        table.setdefault(ligne, []).append({"name": nom, "lat": lat, "lon": lon})
+
+    for arrets in table.values():
+        arrets.sort(key=lambda a: a["name"])
+
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(table, f, ensure_ascii=False, separators=(",", ":"))
+    import os
+    print("%s : %d lignes, %d arrêts, %d ignorés, %.1f Mo"
+          % (args.out, len(table), sum(len(v) for v in table.values()), ignores,
+             os.path.getsize(args.out) / 1e6))
 
 
 def cmd_audit(args):
@@ -348,6 +478,19 @@ def main():
     p = sub.add_parser("verify", help="vérifie les invariants dont l'app dépend")
     p.add_argument("stations", help="chemin vers NavigoStations.json")
     p.set_defaults(func=cmd_verify)
+
+    p = sub.add_parser("lines", help="génère NavigoLines.json")
+    p.add_argument("-o", "--out", default="NavigoLines.json")
+    p.add_argument("--merge", help="NavigoLines.json existant, à compléter sans rien retirer")
+    p.set_defaults(func=cmd_lines)
+
+    p = sub.add_parser("linestops", help="génère LineStops.json, arrêts par ligne")
+    p.add_argument("-o", "--out", default="LineStops.json")
+    p.set_defaults(func=cmd_linestops)
+
+    p = sub.add_parser("geo", help="génère NearbyStops.json, table de proximité")
+    p.add_argument("-o", "--out", default="NearbyStops.json")
+    p.set_defaults(func=cmd_geo)
 
     p = sub.add_parser("audit", help="mesure la couverture des codes billettiques")
     p.set_defaults(func=cmd_audit)
