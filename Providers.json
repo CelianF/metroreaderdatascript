@@ -1,0 +1,363 @@
+{
+  "serviceProviders": [
+    {
+      "id": 2,
+      "name": "SNCF"
+    },
+    {
+      "id": 3,
+      "name": "RATP"
+    },
+    {
+      "id": 4,
+      "name": "Optile"
+    },
+    {
+      "id": 7,
+      "name": "RATP Cap Bièvre"
+    },
+    {
+      "id": 8,
+      "name": "ORA"
+    },
+    {
+      "id": 9,
+      "name": "Keolis"
+    },
+    {
+      "id": 10,
+      "name": "IDF Mobilites"
+    },
+    {
+      "id": 12,
+      "name": "RATP Dev"
+    },
+    {
+      "id": 14,
+      "name": "OrlyVal Service"
+    },
+    {
+      "id": 17,
+      "name": "Stretto"
+    },
+    {
+      "id": 109,
+      "name": "Keolis Ouest Val-de-Marne T9"
+    },
+    {
+      "id": 115,
+      "name": "CSO (VEOLIA)"
+    },
+    {
+      "id": 116,
+      "name": "R'Bus (VEOLIA)"
+    },
+    {
+      "id": 156,
+      "name": "Phebus"
+    },
+    {
+      "id": 175,
+      "name": "RATP (Veolia Transport Nanterre)"
+    },
+    {
+      "id": 201,
+      "dsp": 1,
+      "network": "Vexin",
+      "operator": "Transdev Vexin"
+    },
+    {
+      "id": 202,
+      "dsp": 2,
+      "network": "Cergy-Pontoise Confluence",
+      "operator": ""
+    },
+    {
+      "id": 203,
+      "dsp": 3,
+      "network": "Haut Val d’Oise",
+      "operator": ""
+    },
+    {
+      "id": 204,
+      "dsp": 4,
+      "network": "Val Parisis",
+      "operator": ""
+    },
+    {
+      "id": 205,
+      "dsp": 5,
+      "network": "Vallée de Montmorency",
+      "operator": "Transdev Valmy"
+    },
+    {
+      "id": 206,
+      "dsp": 6,
+      "network": "Roissy Ouest",
+      "operator": ""
+    },
+    {
+      "id": 207,
+      "dsp": 7,
+      "network": "Terres d'Envol",
+      "operator": ""
+    },
+    {
+      "id": 208,
+      "dsp": 8,
+      "network": "Roissy Est",
+      "operator": ""
+    },
+    {
+      "id": 209,
+      "dsp": 9,
+      "network": "Marne et Brie",
+      "operator": ""
+    },
+    {
+      "id": 210,
+      "dsp": 10,
+      "network": "Transdev Marne la Vallée",
+      "operator": ""
+    },
+    {
+      "id": 211,
+      "dsp": 11,
+      "network": "Meaux et Ourcq",
+      "operator": ""
+    },
+    {
+      "id": 212,
+      "dsp": 12,
+      "network": "Brie et 2 Morin",
+      "operator": ""
+    },
+    {
+      "id": 213,
+      "dsp": 13,
+      "network": "Pays Briard",
+      "operator": ""
+    },
+    {
+      "id": 214,
+      "dsp": 14,
+      "network": "Provinois – Brie et Seine",
+      "operator": ""
+    },
+    {
+      "id": 215,
+      "dsp": 15,
+      "network": "Pays de Montereau",
+      "operator": ""
+    },
+    {
+      "id": 216,
+      "dsp": 16,
+      "network": "Fontainebleau - Moret",
+      "operator": ""
+    },
+    {
+      "id": 217,
+      "dsp": 17,
+      "network": "Vallée du Loing - Nemours",
+      "operator": ""
+    },
+    {
+      "id": 218,
+      "dsp": 18,
+      "network": "Grand Melun",
+      "operator": ""
+    },
+    {
+      "id": 219,
+      "dsp": 19,
+      "network": "Transdev Sénart",
+      "operator": ""
+    },
+    {
+      "id": 220,
+      "dsp": 20,
+      "network": "Val d’Yerres Val de Seine",
+      "operator": ""
+    },
+    {
+      "id": 221,
+      "dsp": 21,
+      "network": "Marne et Seine",
+      "operator": "Transdev Coteaux de la Marne"
+    },
+    {
+      "id": 222,
+      "dsp": 22,
+      "network": "Seine Grand Orly",
+      "operator": "Keolis Ouest Val-de-Marne"
+    },
+    {
+      "id": 223,
+      "dsp": 23,
+      "network": "Évry Centre Essonne",
+      "operator": ""
+    },
+    {
+      "id": 224,
+      "dsp": 24,
+      "network": "Essonne Sud Ouest",
+      "operator": ""
+    },
+    {
+      "id": 225,
+      "dsp": 25,
+      "network": "Cœur d’Essonne",
+      "operator": ""
+    },
+    {
+      "id": 226,
+      "dsp": 26,
+      "network": "Paris Saclay",
+      "operator": "RC Saclay"
+    },
+    {
+      "id": 227,
+      "dsp": 27,
+      "network": "Vélizy Vallées",
+      "operator": ""
+    },
+    {
+      "id": 228,
+      "dsp": 28,
+      "network": "Grand Versailles",
+      "operator": "Transdev Versailles"
+    },
+    {
+      "id": 229,
+      "dsp": 29,
+      "network": "Saint-Quentin-en-Yvelines",
+      "operator": ""
+    },
+    {
+      "id": 230,
+      "dsp": 30,
+      "network": "Centre et Sud Yvelines",
+      "operator": "Transdev Sud Yvelines"
+    },
+    {
+      "id": 231,
+      "dsp": 31,
+      "network": "Essonne Sud Est",
+      "operator": ""
+    },
+    {
+      "id": 232,
+      "dsp": 32,
+      "network": "Saint Germain Boucles de Seine",
+      "operator": ""
+    },
+    {
+      "id": 233,
+      "dsp": 33,
+      "network": "Argenteuil - Boucles de Seine",
+      "operator": ""
+    },
+    {
+      "id": 234,
+      "dsp": 34,
+      "network": "Poissy - les Mureaux",
+      "operator": ""
+    },
+    {
+      "id": 235,
+      "dsp": 35,
+      "network": "Mantois",
+      "operator": "RATP Cap Mantois"
+    },
+    {
+      "id": 236,
+      "dsp": 36,
+      "network": "Massy – Juvisy",
+      "operator": ""
+    },
+    {
+      "id": 237,
+      "dsp": 37,
+      "network": "Bièvre",
+      "operator": ""
+    },
+    {
+      "id": 238,
+      "dsp": 38,
+      "network": "Lignes Île-de-France Ouest",
+      "operator": ""
+    },
+    {
+      "id": 239,
+      "dsp": 39,
+      "network": "Express Roissy",
+      "operator": ""
+    },
+    {
+      "id": 240,
+      "dsp": 40,
+      "network": "Croix du Sud",
+      "operator": ""
+    },
+    {
+      "id": 241,
+      "dsp": 41,
+      "network": "Defense Seine Ouest",
+      "operator": ""
+    },
+    {
+      "id": 242,
+      "dsp": 42,
+      "network": "Boucle Nord de Seine",
+      "operator": ""
+    },
+    {
+      "id": 243,
+      "dsp": 43,
+      "network": "Plaine Saint-Denis",
+      "operator": ""
+    },
+    {
+      "id": 244,
+      "dsp": 44,
+      "network": "Transdev Ourcq",
+      "operator": ""
+    },
+    {
+      "id": 245,
+      "dsp": 45,
+      "network": "RATP Cap Boucles de Marne",
+      "operator": ""
+    },
+    {
+      "id": 246,
+      "dsp": 46,
+      "network": "Pompadour",
+      "operator": ""
+    },
+    {
+      "id": 247,
+      "dsp": 47,
+      "network": "Seine Orly",
+      "operator": ""
+    },
+    {
+      "id": 299,
+      "network": "GC Marne et Brie",
+      "operator": ""
+    }
+  ],
+  "networks": [
+    {
+      "name": "Montréal",
+      "countryId": "124",
+      "networkId": "001"
+    },
+    {
+      "name": "Île-de-France",
+      "countryId": "250",
+      "networkId": "901"
+    }
+  ]
+}
