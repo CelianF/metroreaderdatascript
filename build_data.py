@@ -34,7 +34,11 @@ DATASET_LIGNES = "referentiel-des-lignes"
 DATASET_ARRETS_LIGNES = "arrets-lignes"
 EXPORT_URL = (
     "https://data.iledefrance-mobilites.fr/api/explore/v2.1"
-    "/catalog/datasets/{dataset}/exports/json"
+    "/catalog/datasets/{dataset}/exports/json?select=*"
+)
+CATALOG_URL = (
+    "https://data.iledefrance-mobilites.fr/api/explore/v2.1"
+    "/catalog/datasets/{dataset}"
 )
 
 # Fournisseurs IDFM hors délégation, avec le code qu'ils portent sur la carte.
@@ -52,10 +56,33 @@ ACCENTS = [("Ile-de-France", "Île-de-France"), ("Vallee", "Vallée"), ("Bievre"
            ("Essone", "Essonne"), ("Coeur", "Cœur"), ("Aeroport", "Aéroport")]
 
 
+def annonce(dataset):
+    """Le nombre d'enregistrements que le catalogue déclare, et la date du
+    dernier traitement. Sert à vérifier ce que l'export nous rend."""
+    url = CATALOG_URL.format(dataset=dataset)
+    try:
+        with urllib.request.urlopen(url, timeout=60) as r:
+            meta = json.loads(r.read().decode("utf-8"))
+        defaut = meta.get("metas", {}).get("default", {})
+        return defaut.get("records_count"), defaut.get("data_processed")
+    except (urllib.error.URLError, ValueError, KeyError, TypeError):
+        return None, None
+
+
 def fetch(dataset=DATASET):
-    """Télécharge un jeu complet. L'export ne demande ni clé ni pagination."""
+    """Télécharge un jeu complet. L'export ne demande ni clé ni pagination.
+
+    Le `select=*` de l'URL n'est pas décoratif. Sans aucune clause, l'export
+    ressert un dump pré-calculé qui retarde de plusieurs jours : 74 422 arrêts
+    de lignes au lieu des 74 294 annoncés, et « Bourg-la-Reine RER » là où le
+    référentiel dit « Gare de Bourg-la-Reine » depuis le renommage des gares.
+    La moindre clause force le calcul à la volée. Le compte annoncé est vérifié
+    derrière, pour que la panne se voie si l'astuce cesse de marcher.
+    """
     url = EXPORT_URL.format(dataset=dataset)
-    print("téléchargement de %s…" % dataset, file=sys.stderr)
+    attendu, traite = annonce(dataset)
+    print("téléchargement de %s…%s" % (dataset, " (traité le %s)" % traite if traite else ""),
+          file=sys.stderr)
     requete = urllib.request.Request(url, headers={"Accept-Encoding": "gzip"})
     with urllib.request.urlopen(requete, timeout=300) as r:
         brut = r.read()
@@ -64,6 +91,10 @@ def fetch(dataset=DATASET):
         brut = gzip.decompress(brut)
     data = json.loads(brut.decode("utf-8"))
     print("  %d enregistrements" % len(data), file=sys.stderr)
+    if attendu is not None and len(data) != attendu:
+        print("  ATTENTION : le catalogue en annonce %d. L'export sert sans doute\n"
+              "  un cache périmé — vérifier que l'URL porte bien une clause."
+              % attendu, file=sys.stderr)
     return data
 
 

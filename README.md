@@ -24,6 +24,21 @@ fournisseurs 1 et 59 côté IDFM.
 La règle se vérifie sur les noms : le fournisseur 526 est « PARIS SACLAY », donc
 l'exploitant 226, donc la DSP 26.
 
+## Le piège de l'export
+
+L'API d'export d'Opendatasoft sert **un dump pré-calculé quand l'URL ne porte
+aucune clause**, et ce dump retarde de plusieurs jours sans que rien ne le
+signale : `cache-control` annonce `no-store`, et le jeu paraît complet.
+
+Au 9 septembre 2026, `arrets-lignes` rendait ainsi 74 422 enregistrements pour
+74 294 annoncés au catalogue, avec « Bourg-la-Reine RER » là où le référentiel
+disait « Gare de Bourg-la-Reine » depuis le renommage des gares. La moindre
+clause — ici `select=*` — force le calcul à la volée et rend le jeu à jour.
+
+`fetch()` porte donc cette clause, et compare systématiquement le nombre
+d'enregistrements reçus à celui que le catalogue annonce. Si l'astuce cesse un
+jour de marcher, l'écart s'affiche au lieu de passer inaperçu.
+
 ## La limite, et elle est sérieuse
 
 **IDFM ne renseigne pas `privatecode` pour tous les transporteurs.** Là où
@@ -86,5 +101,6 @@ En l'état, la commande ne produit qu'un brouillon.
 ## À faire
 
 - joindre `arrets-lignes` pour peupler `line_id` et `lines`, et lever le garde-fou de `stations`
-- établir la correspondance entre les identifiants de ligne IDFM et les numéros de course portés par la carte
-- générer `NavigoLines.json`, aujourd'hui non couvert
+- signaler à IDFM les arrêts dont le nom a changé sur le terrain sans changer au
+  référentiel : « Pont Royal RER » s'appelle Bagneux RER depuis le prolongement
+  de la ligne 4
