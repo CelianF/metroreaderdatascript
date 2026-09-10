@@ -433,6 +433,50 @@ def cmd_linestops(args):
              os.path.getsize(args.out) / 1e6))
 
 
+def cmd_corrections(args):
+    """Revérifie les corrections livrées à l'app contre le référentiel vivant.
+
+    Une correction surcharge le référentiel : elle doit s'effacer le jour où il
+    se corrige en amont, pas persister en silence. Chaque prémisse est donc
+    rejouée — la ligne visée existe-t-elle encore, et le code billettique
+    reste-t-il indistinct entre elle et celle qu'elle déloge.
+    """
+    with open(args.corrections, encoding="utf-8") as f:
+        corrections = json.load(f)
+    lignes = {l.get("id_line"): l for l in fetch(DATASET_LIGNES) if l.get("id_line")}
+
+    souci = 0
+    for c in corrections:
+        etiquette = "exploitant %s course %s -> %s" % (c["provider_id"], c["line_id"], c["public_id"])
+        cible = lignes.get(c["public_id"])
+        if cible is None:
+            print("  CADUQUE  %s : la ligne visée a disparu du référentiel" % etiquette)
+            souci += 1
+            continue
+
+        delogee = lignes.get(c["remplace"]) if c.get("remplace") else None
+        if c.get("remplace") and delogee is None:
+            print("  À REVOIR %s : la ligne délogée a disparu du référentiel" % etiquette)
+            souci += 1
+            continue
+
+        if delogee is not None:
+            ici, la = str(cible.get("privatecode")), str(delogee.get("privatecode"))
+            if ici != la:
+                print("  CADUQUE  %s : les deux lignes portent maintenant des codes\n"
+                      "           distincts (%s / %s). Le référentiel les départage seul,\n"
+                      "           la correction n'a plus lieu d'être." % (etiquette, ici, la))
+                souci += 1
+                continue
+
+        print("  tient    %s — %s, code %s  [%s]\n           %s"
+              % (etiquette, cible.get("shortname_line"), cible.get("privatecode"),
+                 c.get("fonde_sur") or "non précisé",
+                 cible.get("shortname_groupoflines") or ""))
+
+    print("\n%d correction(s) livrée(s), %d à revoir" % (len(corrections), souci))
+
+
 def cmd_audit(args):
     rows = fetch()
     fournisseurs = collect_fournisseurs(rows)
@@ -522,6 +566,12 @@ def main():
     p = sub.add_parser("geo", help="génère NearbyStops.json, table de proximité")
     p.add_argument("-o", "--out", default="NearbyStops.json")
     p.set_defaults(func=cmd_geo)
+
+    p = sub.add_parser("corrections", help="revérifie les corrections livrées à l'app")
+    p.add_argument("corrections", nargs="?",
+                   default="../metroreader/metroreader/Data/LineCorrections.json",
+                   help="chemin vers LineCorrections.json")
+    p.set_defaults(func=cmd_corrections)
 
     p = sub.add_parser("audit", help="mesure la couverture des codes billettiques")
     p.set_defaults(func=cmd_audit)

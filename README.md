@@ -100,6 +100,10 @@ En l'état, la commande ne produit qu'un brouillon.
 
 ## À faire
 
+- `decode_privatecode` lit l'exploitant dans le premier triplet, mais 139 lignes
+  du référentiel y portent `000` et le logent dans le deuxième : `000535201`
+  vaut 535 − 300 = 235, Mantois. La règle tient sur 138 des 139, les noms
+  d'exploitants le confirment. Ces lignes sont aujourd'hui ignorées en silence.
 - joindre `arrets-lignes` pour peupler `line_id` et `lines`, et lever le garde-fou de `stations`
 - signaler à IDFM les arrêts dont le nom a changé sur le terrain sans changer au
   référentiel : « Pont Royal RER » s'appelle Bagneux RER depuis le prolongement
