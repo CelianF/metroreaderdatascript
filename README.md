@@ -91,6 +91,14 @@ portant `provider_id 59` et `line_id 17`. Un fichier régénéré qui perdrait l
 
 ### `stations`
 
+> **Une régénération complète perd de la donnée.** La table livrée à l'app
+> contient 9 081 arrêts de bus RATP, dont **3 867 qu'IDFM ne publie plus** —
+> sur les 4 169 codes communs, les noms concordent à 98,8 %, donc ces orphelins
+> sont bons. Ils sont aujourd'hui recopiés dans `StopCorrections.json`, qui
+> survit à la régénération ; ne pas les en retirer. Même remarque pour les
+> `line_id` de `NavigoLines.json`, qui ne se dérivent d'aucun champ publié.
+
+
 **Refuse de s'exécuter sans `--force`, et c'est volontaire.**
 `arrets-transporteur` ne contient aucune information de ligne, donc `line_id` et
 `lines` sortiraient vides — ce qui casse le T7 et la recherche d'arrêt par
