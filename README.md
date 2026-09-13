@@ -89,6 +89,25 @@ rattrape par un XOR `0x8000` réservé à `line_id == 17`. Il exige donc des arr
 portant `provider_id 59` et `line_id 17`. Un fichier régénéré qui perdrait les
 `line_id` casserait silencieusement ces 35 arrêts.
 
+`verify` lit les deux formats décrits ci-dessous.
+
+### `compact`
+
+Réécrit `NavigoStations.json` au format compact, que l'app lit plus vite :
+
+```
+python3 build_data.py compact ../metroreader/metroreader/Data/NavigoStations.json
+```
+
+L'ancien format recopiait chaque ligne dans chaque arrêt qu'elle dessert : 4 079
+lignes distinctes y figuraient 93 132 fois, soit 16 Mo sur 24,6. Le format
+compact est un objet `{"lines": [...], "stations": [...]}` où chaque ligne
+distincte figure une fois, et où le champ `lines` d'un arrêt ne porte plus que
+des indices dans cette table. La commande relit le fichier écrit et refuse de
+conclure s'il ne redonne pas exactement les mêmes arrêts. L'app lit toujours
+l'ancien format : un fichier produit autrement reste utilisable, seulement plus
+lent à charger.
+
 ### `stations`
 
 > **Une régénération complète perd de la donnée.** La table livrée à l'app

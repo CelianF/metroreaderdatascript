@@ -19,6 +19,8 @@ partir d'une carte. La commande `audit` mesure l'étendue du problème.
 Usage :
     python3 build_data.py providers  [--merge chemin/vers/Providers.json] [-o …]
     python3 build_data.py stations   [-o …]
+    python3 build_data.py compact    [chemin/vers/NavigoStations.json] [-o …]
+    python3 build_data.py verify     chemin/vers/NavigoStations.json
     python3 build_data.py audit
 """
 
@@ -250,6 +252,55 @@ MODES = {"bus": "Bus urbain", "metro": "Métro", "tram": "Tramway", "rail": "Tra
          "cablecar": "Câble", "ferry": "Navette fluviale"}
 
 
+def lire_stations(chemin):
+    """Les arrêts de NavigoStations.json, lignes déployées, quel que soit le format.
+
+    L'ancien format recopiait chaque ligne dans chaque arrêt qu'elle dessert :
+    4 079 lignes distinctes y figuraient 93 132 fois, soit 16 Mo sur 24,6. Le
+    format compact les range une fois dans une table et ne donne à chaque arrêt
+    que leurs indices. L'app lit les deux.
+    """
+    with open(chemin, encoding="utf-8") as f:
+        doc = json.load(f)
+    if isinstance(doc, list):
+        return doc
+    table = doc["lines"]
+    return [dict(s, lines=[table[i] for i in s["lines"]]) for s in doc["stations"]]
+
+
+def compacter(stations):
+    """Le format compact : chaque ligne distincte une fois, les arrêts par indices."""
+    table, index, sortie = [], {}, []
+    for s in stations:
+        indices = []
+        for ligne in s.get("lines", []):
+            cle = json.dumps(ligne, sort_keys=True, ensure_ascii=False)
+            if cle not in index:
+                index[cle] = len(table)
+                table.append(ligne)
+            indices.append(index[cle])
+        sortie.append(dict(s, lines=indices))
+    return {"lines": table, "stations": sortie}
+
+
+def ecrire_stations(chemin, stations):
+    with open(chemin, "w", encoding="utf-8") as f:
+        json.dump(compacter(stations), f, ensure_ascii=False, separators=(",", ":"))
+
+
+def cmd_compact(args):
+    import os
+    avant = os.path.getsize(args.stations)
+    stations = lire_stations(args.stations)
+    sortie = args.out or args.stations
+    ecrire_stations(sortie, stations)
+    # Relu aussitôt : la conversion ne doit rien perdre ni rien réordonner.
+    if lire_stations(sortie) != stations:
+        sys.exit("ÉCHEC : le fichier compact ne redonne pas les mêmes arrêts.")
+    print("%s : %d arrêts, %.1f Mo → %.1f Mo"
+          % (sortie, len(stations), avant / 1e6, os.path.getsize(sortie) / 1e6))
+
+
 def cmd_stations(args):
     if not args.force:
         sys.exit(
@@ -296,8 +347,7 @@ def cmd_stations(args):
             "lon": pt["lon"],
             "lines": [],
         })
-    with open(args.out, "w", encoding="utf-8") as f:
-        json.dump(out, f, ensure_ascii=False)
+    ecrire_stations(args.out, out)
     print("%s : %d arrêts écrits, %d ignorés" % (args.out, len(out), ignores))
     print("ATTENTION : le mode vient de arttype, qui ne distingue pas bus urbain "
           "et interurbain, et le tableau lines n'est pas renseigné. À valider "
@@ -495,8 +545,7 @@ def cmd_audit(args):
 
 def cmd_verify(args):
     """Vérifie les invariants dont dépend le code de l'app."""
-    with open(args.stations, encoding="utf-8") as f:
-        st = json.load(f)
+    st = lire_stations(args.stations)
 
     ok = True
 
@@ -553,6 +602,13 @@ def main():
     p = sub.add_parser("verify", help="vérifie les invariants dont l'app dépend")
     p.add_argument("stations", help="chemin vers NavigoStations.json")
     p.set_defaults(func=cmd_verify)
+
+    p = sub.add_parser("compact", help="réécrit NavigoStations.json au format compact")
+    p.add_argument("stations", nargs="?",
+                   default="../metroreader/metroreader/Data/NavigoStations.json",
+                   help="chemin vers NavigoStations.json, ancien ou compact")
+    p.add_argument("-o", "--out", help="fichier de sortie, le fichier lu par défaut")
+    p.set_defaults(func=cmd_compact)
 
     p = sub.add_parser("lines", help="génère NavigoLines.json")
     p.add_argument("-o", "--out", default="NavigoLines.json")
