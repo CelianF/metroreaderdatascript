@@ -248,7 +248,7 @@ def cmd_providers(args):
 
 
 MODES = {"bus": "Bus urbain", "metro": "Métro", "tram": "Tramway", "rail": "Train", "metro": "Métro", "tram": "Tramway",
-         "rail": "Train", "train": "Train", "funicular": "Câble",
+         "rail": "Train", "train": "Train", "funicular": "Funiculaire",
          "cablecar": "Câble", "ferry": "Navette fluviale"}
 
 
